@@ -22,8 +22,10 @@ type Memcached struct {
 }
 
 type MemcachedSpec struct {
-	// Fill me
+    // Size is the size of the memcached deployment
+    Size int32 `json:"size"`
 }
 type MemcachedStatus struct {
-	// Fill me
+    // Nodes are the names of the memcached pods
+    Nodes []string `json:"nodes"`
 }
