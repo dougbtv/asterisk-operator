@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
-	v1alpha1 "github.com/dougbtv/asterisk-operator/pkg/apis/cache/v1alpha1"
+	v1alpha1 "github.com/dougbtv/asterisk-operator/pkg/apis/voip/v1alpha1"
 
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
 	// "github.com/sirupsen/logrus"
@@ -16,13 +16,16 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 )
 
+// NewHandler used here.
 func NewHandler() sdk.Handler {
 	return &Handler{}
 }
 
+// Handler used elsewhere.
 type Handler struct {
 }
 
+// Handle method.
 func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 	switch o := event.Object.(type) {
 	case *v1alpha1.Asterisk:
