@@ -24,7 +24,7 @@ func main() {
 
 	sdk.ExposeMetricsPort()
 
-	resource := "cache.example.com/v1alpha1"
+	resource := "voip.example.com/v1alpha1"
 	kind := "Asterisk"
 	namespace, err := k8sutil.GetWatchNamespace()
 	if err != nil {
