@@ -8,5 +8,5 @@ vendor/k8s.io/code-generator/generate-groups.sh \
 deepcopy \
 github.com/dougbtv/asterisk-operator/pkg/generated \
 github.com/dougbtv/asterisk-operator/pkg/apis \
-cache:v1alpha1 \
+voip:v1alpha1 \
 --go-header-file "./tmp/codegen/boilerplate.go.txt"
