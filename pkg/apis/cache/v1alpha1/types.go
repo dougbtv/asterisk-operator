@@ -23,8 +23,8 @@ type Memcached struct {
 
 type MemcachedSpec struct {
   // Size is the size of the memcached deployment
-  Size   int32 `json:"size"`
-  Config int32 `json:"config"`
+  Size   int32    `json:"size"`
+  Config []string `json:"config"`
 }
 
 type MemcachedStatus struct {
