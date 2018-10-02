@@ -1,13 +1,14 @@
 package stub
 
 import (
+	"context"
 	"fmt"
 	"reflect"
-	"context"
 
 	v1alpha1 "github.com/dougbtv/asterisk-operator/pkg/apis/cache/v1alpha1"
 
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
+	"github.com/sirupsen/logrus"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -45,6 +46,8 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 		if err != nil {
 			return fmt.Errorf("failed to get deployment: %v", err)
 		}
+		config := memcached.Spec.Config
+		logrus.Infof("The config: %v", config)
 		size := memcached.Spec.Size
 		if *dep.Spec.Replicas != size {
 			dep.Spec.Replicas = &size
