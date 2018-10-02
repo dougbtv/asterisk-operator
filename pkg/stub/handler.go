@@ -50,7 +50,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 			return fmt.Errorf("failed to get deployment: %v", err)
 		}
 		config := asterisk.Spec.Config
-		// logrus.Infof("The config: %v", config)
+		logrus.Infof("The config: %v", config)
 		size := asterisk.Spec.Size
 		if *dep.Spec.Replicas != size {
 			dep.Spec.Replicas = &size
