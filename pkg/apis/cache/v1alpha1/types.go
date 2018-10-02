@@ -6,28 +6,28 @@ import (
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type MemcachedList struct {
+type AsteriskList struct {
   metav1.TypeMeta `json:",inline"`
   metav1.ListMeta `json:"metadata"`
-  Items           []Memcached `json:"items"`
+  Items           []Asterisk `json:"items"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-type Memcached struct {
+type Asterisk struct {
   metav1.TypeMeta   `json:",inline"`
   metav1.ObjectMeta `json:"metadata"`
-  Spec              MemcachedSpec   `json:"spec"`
-  Status            MemcachedStatus `json:"status,omitempty"`
+  Spec              AsteriskSpec   `json:"spec"`
+  Status            AsteriskStatus `json:"status,omitempty"`
 }
 
-type MemcachedSpec struct {
-  // Size is the size of the memcached deployment
+type AsteriskSpec struct {
+  // Size is the size of the Asterisk deployment
   Size   int32  `json:"size"`
   Config string `json:"config"`
 }
 
-type MemcachedStatus struct {
-  // Nodes are the names of the memcached pods
+type AsteriskStatus struct {
+  // Nodes are the names of the Asterisk pods
   Nodes []string `json:"nodes"`
 }

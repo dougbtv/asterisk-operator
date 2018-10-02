@@ -25,7 +25,7 @@ func main() {
 	sdk.ExposeMetricsPort()
 
 	resource := "cache.example.com/v1alpha1"
-	kind := "Memcached"
+	kind := "Asterisk"
 	namespace, err := k8sutil.GetWatchNamespace()
 	if err != nil {
 		logrus.Fatalf("failed to get watch namespace: %v", err)

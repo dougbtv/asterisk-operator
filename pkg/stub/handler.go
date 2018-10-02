@@ -8,7 +8,7 @@ import (
 	v1alpha1 "github.com/dougbtv/asterisk-operator/pkg/apis/cache/v1alpha1"
 
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
-	"github.com/sirupsen/logrus"
+	// "github.com/sirupsen/logrus"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -25,8 +25,8 @@ type Handler struct {
 
 func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 	switch o := event.Object.(type) {
-	case *v1alpha1.Memcached:
-		memcached := o
+	case *v1alpha1.Asterisk:
+		asterisk := o
 
 		// Ignore the delete event since the garbage collector will clean up all secondary resources for the CR
 		// All secondary resources must have the CR set as their OwnerReference for this to be the case
@@ -35,7 +35,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 		}
 
 		// Create the deployment if it doesn't exist
-		dep := deploymentForMemcached(memcached)
+		dep := deploymentForAsterisk(asterisk)
 		err := sdk.Create(dep)
 		if err != nil && !apierrors.IsAlreadyExists(err) {
 			return fmt.Errorf("failed to create deployment: %v", err)
@@ -46,9 +46,9 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 		if err != nil {
 			return fmt.Errorf("failed to get deployment: %v", err)
 		}
-		config := memcached.Spec.Config
-		logrus.Infof("The config: %v", config)
-		size := memcached.Spec.Size
+		config := asterisk.Spec.Config
+		// logrus.Infof("The config: %v", config)
+		size := asterisk.Spec.Size
 		if *dep.Spec.Replicas != size {
 			dep.Spec.Replicas = &size
 			err = sdk.Update(dep)
@@ -57,29 +57,29 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 			}
 		}
 
-		// Update the Memcached status with the pod names
+		// Update the Asterisk status with the pod names
 		podList := podList()
-		labelSelector := labels.SelectorFromSet(labelsForMemcached(memcached.Name)).String()
+		labelSelector := labels.SelectorFromSet(labelsForAsterisk(asterisk.Name)).String()
 		listOps := &metav1.ListOptions{LabelSelector: labelSelector}
-		err = sdk.List(memcached.Namespace, podList, sdk.WithListOptions(listOps))
+		err = sdk.List(asterisk.Namespace, podList, sdk.WithListOptions(listOps))
 		if err != nil {
 			return fmt.Errorf("failed to list pods: %v", err)
 		}
 		podNames := getPodNames(podList.Items)
-		if !reflect.DeepEqual(podNames, memcached.Status.Nodes) {
-			memcached.Status.Nodes = podNames
-			err := sdk.Update(memcached)
+		if !reflect.DeepEqual(podNames, asterisk.Status.Nodes) {
+			asterisk.Status.Nodes = podNames
+			err := sdk.Update(asterisk)
 			if err != nil {
-				return fmt.Errorf("failed to update memcached status: %v", err)
+				return fmt.Errorf("failed to update asterisk status: %v", err)
 			}
 		}
 	}
 	return nil
 }
 
-// deploymentForMemcached returns a memcached Deployment object
-func deploymentForMemcached(m *v1alpha1.Memcached) *appsv1.Deployment {
-	ls := labelsForMemcached(m.Name)
+// deploymentForAsterisk returns a asterisk Deployment object
+func deploymentForAsterisk(m *v1alpha1.Asterisk) *appsv1.Deployment {
+	ls := labelsForAsterisk(m.Name)
 	replicas := m.Spec.Size
 
 	dep := &appsv1.Deployment{
@@ -102,13 +102,9 @@ func deploymentForMemcached(m *v1alpha1.Memcached) *appsv1.Deployment {
 				},
 				Spec: v1.PodSpec{
 					Containers: []v1.Container{{
-						Image:   "memcached:1.4.36-alpine",
-						Name:    "memcached",
-						Command: []string{"memcached", "-m=64", "-o", "modern", "-v"},
-						Ports: []v1.ContainerPort{{
-							ContainerPort: 11211,
-							Name:          "memcached",
-						}},
+						Image: "dougbtv/asterisk14",
+						Name:  "asterisk",
+						// Command: []string{"/bin/bash", "-c", "cat /etc/asterisk/entrypoint.sh | /bin/bash"},
 					}},
 				},
 			},
@@ -118,10 +114,10 @@ func deploymentForMemcached(m *v1alpha1.Memcached) *appsv1.Deployment {
 	return dep
 }
 
-// labelsForMemcached returns the labels for selecting the resources
-// belonging to the given memcached CR name.
-func labelsForMemcached(name string) map[string]string {
-	return map[string]string{"app": "memcached", "memcached_cr": name}
+// labelsForAsterisk returns the labels for selecting the resources
+// belonging to the given asterisk CR name.
+func labelsForAsterisk(name string) map[string]string {
+	return map[string]string{"app": "asterisk", "asterisk_cr": name}
 }
 
 // addOwnerRefToObject appends the desired OwnerReference to the object
@@ -129,8 +125,8 @@ func addOwnerRefToObject(obj metav1.Object, ownerRef metav1.OwnerReference) {
 	obj.SetOwnerReferences(append(obj.GetOwnerReferences(), ownerRef))
 }
 
-// asOwner returns an OwnerReference set as the memcached CR
-func asOwner(m *v1alpha1.Memcached) metav1.OwnerReference {
+// asOwner returns an OwnerReference set as the asterisk CR
+func asOwner(m *v1alpha1.Asterisk) metav1.OwnerReference {
 	trueVar := true
 	return metav1.OwnerReference{
 		APIVersion: m.APIVersion,
