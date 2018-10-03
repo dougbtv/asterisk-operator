@@ -24,14 +24,15 @@ func main() {
 
 	sdk.ExposeMetricsPort()
 
-	resource := "cache.example.com/v1alpha1"
-	kind := "Memcached"
+	resource := "voip.example.com/v1alpha1"
+	kind := "Asterisk"
 	namespace, err := k8sutil.GetWatchNamespace()
 	if err != nil {
 		logrus.Fatalf("failed to get watch namespace: %v", err)
 	}
 	resyncPeriod := 5
 	logrus.Infof("Watching %s, %s, %s, %d", resource, kind, namespace, resyncPeriod)
+	logrus.Infof("This is a test!")
 	sdk.Watch(resource, kind, namespace, resyncPeriod)
 	sdk.Handle(stub.NewHandler())
 	sdk.Run(context.TODO())
