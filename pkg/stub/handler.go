@@ -78,39 +78,9 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 				logrus.Infof("!bang each name: %v", podn)
 			}
 
-			// We need to check if there's any blank IPs
-			podIPs := getPodIPs(podList.Items)
-			foundall := true
-			for {
-				logrus.Infof("!bang Pod IPs: %v", podIPs)
-				// If the list is too short, it's not found.
-				logrus.Infof("!bang Lengths: %v < %v", len(podIPs), len(podNames))
-				if len(podIPs) < len(podNames) {
-					foundall = false
-				} else {
-					// Cycle through all the pod IPs, look for blanks.
-					for _, podip := range podIPs {
-						logrus.Infof("!bang each IP: %v", podIPs)
-						if podip == "" {
-							foundall = false
-						}
-					}
-				}
-
-				if foundall {
-					logrus.Infof("!bang TRACE -- FOUND ALL TRUE")
-					break
-				} else {
-					// Sleep a little, then get the list again.
-					time.Sleep(1500 * time.Millisecond)
-					logrus.Infof("!bang TRACE -- TICKER")
-					err = sdk.List(asterisk.Namespace, podList, sdk.WithListOptions(listOps))
-					if err != nil {
-						return fmt.Errorf("failed to list pods: %v", err)
-					}
-					podIPs = getPodIPs(podList.Items)
-					foundall = true
-				}
+			asterr := cycleAsteriskPods(podList, asterisk.Namespace, listOps)
+			if err != nil {
+				return err
 			}
 
 			err := sdk.Update(asterisk)
@@ -120,6 +90,59 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 		}
 	}
 	return nil
+}
+
+// cycleAsteriskPod cycles each one of the asterisk pods, discovers the IP and then builds sip trunks for each one.
+func cycleAsteriskPods(podList v1.PodList, namespace string, listOps metav1.ListOptions) error {
+
+	// We need to check if there's any blank IPs
+	podIPs := getPodIPs(podList.Items)
+	foundall := true
+
+	maxtries := 40
+	tries := 0
+
+	for {
+		logrus.Infof("!bang Pod IPs: %v", podIPs)
+		// If the list is too short, it's not found.
+		logrus.Infof("!bang Lengths: %v < %v", len(podIPs), len(podNames))
+		if len(podIPs) < len(podNames) {
+			foundall = false
+		} else {
+			// Cycle through all the pod IPs, look for blanks.
+			for _, podip := range podIPs {
+				logrus.Infof("!bang each IP: %v", podIPs)
+				if podip == "" {
+					foundall = false
+				}
+			}
+		}
+
+		if foundall {
+			logrus.Infof("!bang TRACE -- FOUND ALL TRUE")
+			break
+		} else {
+			// Sleep a little, then get the list again.
+			time.Sleep(1500 * time.Millisecond)
+			logrus.Infof("!bang TRACE -- TICKER")
+
+			// Query the API again.
+			err = sdk.List(namespace, podList, sdk.WithListOptions(listOps))
+			if err != nil {
+				return fmt.Errorf("failed to list pods during IP discovery: %v", err)
+			}
+			podIPs = getPodIPs(podList.Items)
+			foundall = true
+		}
+
+		tries++
+		if tries >= maxtries {
+			return fmt.Errorf("During IP discovery, exceeded %v", maxtries)
+		}
+	}
+
+	return nil
+
 }
 
 // deploymentForAsterisk returns a asterisk Deployment object
@@ -192,21 +215,7 @@ func podList() *v1.PodList {
 	}
 }
 
-// func getPodIP(podName string) (error, string) {
-
-// 	pods, err := v1.Pods(podName).List(metav1.ListOptions{})
-// 	if err != nil {
-// 		// handle error
-// 		return fmt.Errorf("failed to list pod: %v", podName), nil
-// 	}
-// 	for _, pod := range pods.Items {
-// 		logrus.Infof("!bang Name / PodIP: %v / %v", pod.Name, pod.Status.PodIP)
-// 		return nil, pod.Status.PodIP
-// 	}
-
-// }
-
-// getPodNames returns the pod names of the array of pods passed in
+// getPodIPs returns a map of the pod names and their IPs
 func getPodIPs(pods []v1.Pod) map[string]string {
 	podIPs := make(map[string]string)
 	for _, pod := range pods {
