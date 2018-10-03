@@ -198,6 +198,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	testURL := fmt.Sprintf("%s%s%s", sorceryURL, "/ari/asterisk/config/dynamic/res_pjsip", endpointName)
 	endPointURL := fmt.Sprintf("%s%s%s", sorceryURL, "/ari/asterisk/config/dynamic/res_pjsip/endpoint/", endpointName)
 	identifyURL := fmt.Sprintf("%s%s%s", sorceryURL, "/ari/asterisk/config/dynamic/res_pjsip/identify/", endpointName)
+	aorsURL := fmt.Sprintf("%s%s%s", sorceryURL, "/ari/asterisk/config/dynamic/res_pjsip/aor/", endpointName)
 
 	// ------------------ WAIT FOR ASTERISK BOOTED.
 
@@ -273,6 +274,25 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 
 	data, _ = ioutil.ReadAll(response.Body)
 	logrus.Infof("identify result: %v", string(data))
+
+	// ------------------ AORS
+
+	jsonString = fmt.Sprintf(`{
+		"fields": [
+			{ "attribute": "contact", "value": "%v" }
+		]	
+	}`, fmt.Sprintf("sip:anyuser@%v:5060", endpointIP))
+
+	req, err = http.NewRequest(http.MethodPut, aorsURL, bytes.NewBuffer([]byte(jsonString)))
+	req.Header.Set("Content-Type", "application/json")
+	response, err = client.Do(req)
+
+	if err != nil {
+		logrus.Errorf("The HTTP request for aors failed with error %s", err)
+	}
+
+	data, _ = ioutil.ReadAll(response.Body)
+	logrus.Infof("aors result: %v", string(data))
 
 	/*
 	   url := "http://restapi3.apiary.io/notes"
