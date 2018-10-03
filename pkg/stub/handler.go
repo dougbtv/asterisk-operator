@@ -79,11 +79,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 		if !reflect.DeepEqual(podNames, asterisk.Status.Nodes) {
 			asterisk.Status.Nodes = podNames
 
-			// logrus.Infof("!bang Pod names: %v", podNames)
-			// for _, podn := range podNames {
-			// 	logrus.Infof("!bang each name: %v", podn)
-			// }
-
+			// Here's where we ship off the work to create the SIP trunks.
 			asterr := cycleAsteriskPods(podNames, podList, asterisk.Namespace, listOps)
 			if asterr != nil {
 				return asterr
@@ -177,19 +173,6 @@ func cycleAsteriskPods(podNames []string, podList *v1.PodList, namespace string,
 func createSIPTrunk(targetHostName string, targetHostIP string, endpointName string, endpointIP string) error {
 	logrus.Infof("Trunk to %v -> %v (on %v @ %v)", endpointName, endpointIP, targetHostName, targetHostIP)
 
-	// response, err := http.Get("https://httpbin.org/ip")
-	// if err != nil {
-	// 	fmt.Printf("The HTTP request failed with error %s\n", err)
-	// } else {
-	// 	data, _ := ioutil.ReadAll(response.Body)
-	// 	fmt.Println(string(data))
-	// }
-
-	// createEndPoint(instance_uuid_a,trunkname,info_b.ip,'32',context,function(err,result){
-	// vac.discoverasterisk.getBoxIP(boxid,function(err,asteriskip){
-	// var url = server_url + "/ari/asterisk/config/dynamic/res_pjsip/endpoint/" + username;
-	// curl -X PUT -H "Content-Type: application/json" -u asterisk:secret -d '{"fields": [ { "attribute": "from_user", "value": "alice" }, { "attribute": "allow", "value": "!all,g722,ulaw,alaw"}, {"attribute": "ice_support", "value": "yes"}, {"attribute": "force_rport", "value": "yes"}, {"attribute": "rewrite_contact", "value": "yes"}, {"attribute": "rtp_symmetric", "value": "yes"}, {"attribute": "context", "value": "default" }, {"attribute": "auth", "value": "alice" }, {"attribute": "aors", "value": "alice"} ] }' https://localhost:8088/ari/asterisk/config/dynamic/res_pjsip/endpoint/alice
-
 	// Create the http client.
 	client := &http.Client{}
 
@@ -200,11 +183,16 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	identifyURL := fmt.Sprintf("%s%s%s", sorceryURL, "/ari/asterisk/config/dynamic/res_pjsip/identify/", endpointName)
 	aorsURL := fmt.Sprintf("%s%s%s", sorceryURL, "/ari/asterisk/config/dynamic/res_pjsip/aor/", endpointName)
 
+	// TODO: Properly delete before add?
+	// TODO: This is inefficient in the sense that it's brute force, it does every config every time.
+
 	// ------------------ WAIT FOR ASTERISK BOOTED.
 
+	// Setup some maximums for this loop.
 	tries := 0
 	maxtries := 40
 
+	// Loop until we see a properly booted asterisk instance.
 	for {
 		response, _ := http.Get(testURL)
 		testdata, _ := ioutil.ReadAll(response.Body)
@@ -225,14 +213,6 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 
 	// ------------------ ENDPOINTS
 
-	// jsonData := map[string]string{
-	// 	"transport": "transport-udp",
-	// 	"context":   "default",
-	// 	"aors":      endpointName,
-	// 	"disallow":  "all",
-	// 	"allow":     "ulaw",
-	// }
-
 	jsonString := fmt.Sprintf(`{
 		"fields": [
 			{ "attribute": "transport", "value": "transport-udp" },
@@ -252,8 +232,8 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 		logrus.Errorf("The HTTP request for endpoint failed with error %s", err)
 	}
 
-	data, _ := ioutil.ReadAll(response.Body)
-	logrus.Infof("Endpoint result: %v", string(data))
+	// data, _ := ioutil.ReadAll(response.Body)
+	// logrus.Infof("Endpoint result: %v", string(data))
 
 	// ------------------ INDENTITIES
 
@@ -272,8 +252,8 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 		logrus.Errorf("The HTTP request for identify failed with error %s", err)
 	}
 
-	data, _ = ioutil.ReadAll(response.Body)
-	logrus.Infof("identify result: %v", string(data))
+	// data, _ = ioutil.ReadAll(response.Body)
+	// logrus.Infof("identify result: %v", string(data))
 
 	// ------------------ AORS
 
@@ -291,30 +271,8 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 		logrus.Errorf("The HTTP request for aors failed with error %s", err)
 	}
 
-	data, _ = ioutil.ReadAll(response.Body)
-	logrus.Infof("aors result: %v", string(data))
-
-	/*
-	   url := "http://restapi3.apiary.io/notes"
-	    fmt.Println("URL:>", url)
-
-	    var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
-	    req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
-	    req.Header.Set("X-Custom-Header", "myvalue")
-	    req.Header.Set("Content-Type", "application/json")
-
-	    client := &http.Client{}
-	    resp, err := client.Do(req)
-	    if err != nil {
-	        panic(err)
-	    }
-	    defer resp.Body.Close()
-
-	    fmt.Println("response Status:", resp.Status)
-	    fmt.Println("response Headers:", resp.Header)
-	    body, _ := ioutil.ReadAll(resp.Body)
-	    fmt.Println("response Body:", string(body))
-	*/
+	// data, _ = ioutil.ReadAll(response.Body)
+	// logrus.Infof("aors result: %v", string(data))
 
 	return nil
 }
