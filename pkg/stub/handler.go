@@ -93,7 +93,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 }
 
 // cycleAsteriskPod cycles each one of the asterisk pods, discovers the IP and then builds sip trunks for each one.
-func cycleAsteriskPods(podList v1.PodList, namespace string, listOps metav1.ListOptions) error {
+func cycleAsteriskPods(podList *v1.PodList, namespace string, listOps *metav1.ListOptions) error {
 
 	// We need to check if there's any blank IPs
 	podIPs := getPodIPs(podList.Items)
