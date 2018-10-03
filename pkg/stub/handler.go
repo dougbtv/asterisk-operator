@@ -198,9 +198,9 @@ func deploymentForAsterisk(m *v1alpha1.Asterisk) *appsv1.Deployment {
 				},
 				Spec: v1.PodSpec{
 					Containers: []v1.Container{{
-						// Image: "dougbtv/asterisk-example-operator",
-						Image: "dougbtv/asterisk14",
-						Name:  "asterisk",
+						Image: "dougbtv/asterisk-example-operator",
+						// Image: "dougbtv/asterisk14",
+						Name: "asterisk",
 						// Command: []string{"/bin/bash", "-c", "cat /etc/asterisk/entrypoint.sh | /bin/bash"},
 					}},
 				},
