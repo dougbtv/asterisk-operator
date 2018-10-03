@@ -208,7 +208,7 @@ func podList() *v1.PodList {
 
 // getPodNames returns the pod names of the array of pods passed in
 func getPodIPs(pods []v1.Pod) map[string]string {
-	var podIPs map[string]string
+	podIPs := make(map[string]string)
 	for _, pod := range pods {
 		// logrus.Infof("!bang pod everything: %v", pod)
 		// logrus.Infof("!bang pod IP: %v", pod.Status.PodIP)
