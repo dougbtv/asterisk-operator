@@ -85,7 +85,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 				logrus.Infof("!bang Pod IPs: %v", podIPs)
 				for _, podip := range podNames {
 					if podip == "" {
-						foundall := false
+						foundall = false
 					}
 				}
 				if foundall {
