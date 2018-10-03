@@ -79,8 +79,8 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 			}
 
 			asterr := cycleAsteriskPods(podNames, podList, asterisk.Namespace, listOps)
-			if err != nil {
-				return err
+			if asterr != nil {
+				return asterr
 			}
 
 			err := sdk.Update(asterisk)
