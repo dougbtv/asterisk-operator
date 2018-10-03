@@ -199,7 +199,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	maxtries := 40
 
 	for {
-		response, err := http.Get(testURL)
+		response, _ := http.Get(testURL)
 		testdata, _ := ioutil.ReadAll(response.Body)
 		testdatastring := string(testdata)
 		if strings.Contains(testdatastring, "Invalid method") {
