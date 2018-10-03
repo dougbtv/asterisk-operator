@@ -232,13 +232,13 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	// 	"allow":     "ulaw",
 	// }
 
-	jsonString := fmt.Sprinf(`{
+	jsonString := fmt.Sprintf(`{
 		"fields": [
-		{ "attribute": "transport", "value": "transport-udp" },
-		{ "attribute": "context", "value": "default" },
-		{ "attribute": "aors", "value": "%v" },
-		{ "attribute": "disallow", "value": "all" },
-		{ "attribute": "allow", "value": "ulaw" },
+			{ "attribute": "transport", "value": "transport-udp" },
+			{ "attribute": "context", "value": "default" },
+			{ "attribute": "aors", "value": "%v" },
+			{ "attribute": "disallow", "value": "all" },
+			{ "attribute": "allow", "value": "ulaw" }
 		]	
 	}`, endpointName)
 
@@ -256,15 +256,14 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 
 	// ------------------ INDENTITIES
 
-	jsonData = map[string]string{
-		"endpoint": endpointName,
-		"match":    fmt.Sprintf("%s/%s", endpointIP, "255.255.255.255"),
-	}
+	jsonString = fmt.Sprintf(`{
+		"fields": [
+			{ "attribute": "endpoint", "value": "%v" },
+			{ "attribute": "match", "value": "%v" }
+		]	
+	}`, endpointName, fmt.Sprintf("%s/%s", endpointIP, "255.255.255.255"))
 
-	logrus.Info("jsonData debug: ", jsonData)
-
-	jsonValue, _ = json.Marshal(jsonData)
-	req, err = http.NewRequest(http.MethodPut, identifyURL, bytes.NewBuffer(jsonValue))
+	req, err = http.NewRequest(http.MethodPut, identifyURL, bytes.NewBuffer(jsonString))
 	req.Header.Set("Content-Type", "application/json")
 	response, err = client.Do(req)
 
