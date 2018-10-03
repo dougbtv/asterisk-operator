@@ -224,16 +224,26 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 
 	// ------------------ ENDPOINTS
 
-	jsonData := map[string]string{
-		"transport": "transport-udp",
-		"context":   "default",
-		"aors":      endpointName,
-		"disallow":  "all",
-		"allow":     "ulaw",
-	}
-	jsonValue, _ := json.Marshal(jsonData)
+	// jsonData := map[string]string{
+	// 	"transport": "transport-udp",
+	// 	"context":   "default",
+	// 	"aors":      endpointName,
+	// 	"disallow":  "all",
+	// 	"allow":     "ulaw",
+	// }
+
+	jsonString := fmt.Sprinf(`{
+		"fields": [
+		{ "attribute": "transport", "value": "transport-udp" },
+		{ "attribute": "context", "value": "default" },
+		{ "attribute": "aors", "value": "%v" },
+		{ "attribute": "disallow", "value": "all" },
+		{ "attribute": "allow", "value": "ulaw" },
+		]	
+	}`, endpointName)
+
 	// response, err = http.Post(endPointURL, "application/json", bytes.NewBuffer(jsonValue))
-	req, err := http.NewRequest(http.MethodPut, endPointURL, bytes.NewBuffer(jsonValue))
+	req, err := http.NewRequest(http.MethodPut, endPointURL, bytes.NewBuffer(jsonString))
 	req.Header.Set("Content-Type", "application/json")
 	response, err := client.Do(req)
 
