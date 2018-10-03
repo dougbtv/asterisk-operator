@@ -95,6 +95,10 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 // cycleAsteriskPod cycles each one of the asterisk pods, discovers the IP and then builds sip trunks for each one.
 func cycleAsteriskPods(podNames []string, podList *v1.PodList, namespace string, listOps *metav1.ListOptions) error {
 
+	// We have some weird race, let's try to sleep right away and then requery the api
+	time.Sleep(1500 * time.Millisecond)
+	_ = sdk.List(namespace, podList, sdk.WithListOptions(listOps))
+
 	// We need to check if there's any blank IPs
 	podIPs := getPodIPs(podList.Items)
 	foundall := true
