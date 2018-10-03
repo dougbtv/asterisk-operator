@@ -72,6 +72,9 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 		if !reflect.DeepEqual(podNames, asterisk.Status.Nodes) {
 			asterisk.Status.Nodes = podNames
 			logrus.Infof("!bang Pod names: %v", podNames)
+			for _, podn := range podNames {
+				logrus.Infof("!bang each name: %v", podn)
+			}
 			err := sdk.Update(asterisk)
 			if err != nil {
 				return fmt.Errorf("failed to update asterisk status: %v", err)
@@ -150,6 +153,12 @@ func podList() *v1.PodList {
 		},
 	}
 }
+
+// func getPodIPs(pods []v1.Pod) []string {
+// 	for _, pod := range pods.Items {
+// 		fmt.Println(pod.Name, pod.Status.PodIP)
+// 	}
+// }
 
 // getPodNames returns the pod names of the array of pods passed in
 func getPodNames(pods []v1.Pod) []string {
