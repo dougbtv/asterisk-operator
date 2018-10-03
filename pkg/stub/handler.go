@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 // NewHandler used here.
@@ -199,7 +200,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 
 	for {
 		response, err := http.Get(testURL)
-		if Contains(response.Body, "Invalid method") {
+		if strings.Contains(response.Body, "Invalid method") {
 			// That's good to go, else, keep going.
 			break
 		}
