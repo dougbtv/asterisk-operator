@@ -8,7 +8,7 @@ import (
 	v1alpha1 "github.com/dougbtv/asterisk-operator/pkg/apis/voip/v1alpha1"
 
 	"github.com/operator-framework/operator-sdk/pkg/sdk"
-	// "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -71,6 +71,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 		podNames := getPodNames(podList.Items)
 		if !reflect.DeepEqual(podNames, asterisk.Status.Nodes) {
 			asterisk.Status.Nodes = podNames
+			logrus.Infof("!bang Pod names: %v", podNames)
 			err := sdk.Update(asterisk)
 			if err != nil {
 				return fmt.Errorf("failed to update asterisk status: %v", err)
