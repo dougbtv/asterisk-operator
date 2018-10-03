@@ -198,7 +198,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	maxtries := 40
 
 	for {
-		response, err := http.Get(testURL, "application/json")
+		response, err := http.Get(testURL)
 		if Contains(response.Body, "Invalid method") {
 			// That's good to go, else, keep going.
 			break
