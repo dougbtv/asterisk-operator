@@ -114,7 +114,6 @@ func cycleAsteriskPods(podNames []string, podList *v1.PodList, namespace string,
 		} else {
 			// Cycle through all the pod IPs, look for blanks.
 			for _, podip := range podIPs {
-				logrus.Infof("!bang each IP: %v", podIPs)
 				if podip == "" {
 					foundall = false
 				} else {
@@ -187,7 +186,7 @@ func deploymentForAsterisk(m *v1alpha1.Asterisk) *appsv1.Deployment {
 				},
 				Spec: v1.PodSpec{
 					Containers: []v1.Container{{
-						Image: "dougbtv/asterisk14",
+						Image: "dougbtv/asterisk-example-operator",
 						Name:  "asterisk",
 						// Command: []string{"/bin/bash", "-c", "cat /etc/asterisk/entrypoint.sh | /bin/bash"},
 					}},
