@@ -236,7 +236,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	jsonString := fmt.Sprintf(`{
 		"fields": [
 			{ "attribute": "transport", "value": "transport-udp" },
-			{ "attribute": "context", "value": "default" },
+			{ "attribute": "context", "value": "inbound" },
 			{ "attribute": "aors", "value": "%s" },
 			{ "attribute": "disallow", "value": "all" },
 			{ "attribute": "allow", "value": "ulaw" }
