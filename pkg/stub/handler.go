@@ -243,7 +243,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	}`, endpointName)
 
 	// response, err = http.Post(endPointURL, "application/json", bytes.NewBuffer(jsonValue))
-	req, err := http.NewRequest(http.MethodPut, endPointURL, []bytes(jsonString))
+	req, err := http.NewRequest(http.MethodPut, endPointURL, []byte(jsonString))
 	req.Header.Set("Content-Type", "application/json")
 	response, err := client.Do(req)
 
@@ -263,7 +263,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 		]	
 	}`, endpointName, fmt.Sprintf("%s/%s", endpointIP, "255.255.255.255"))
 
-	req, err = http.NewRequest(http.MethodPut, identifyURL, []bytes(jsonString))
+	req, err = http.NewRequest(http.MethodPut, identifyURL, []byte(jsonString))
 	req.Header.Set("Content-Type", "application/json")
 	response, err = client.Do(req)
 
