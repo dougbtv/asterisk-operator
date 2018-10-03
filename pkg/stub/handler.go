@@ -83,11 +83,18 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 			foundall := true
 			for {
 				logrus.Infof("!bang Pod IPs: %v", podIPs)
-				for _, podip := range podNames {
-					if podip == "" {
-						foundall = false
+				// If the list is too short, it's not found.
+				if len(podIPs) < len(podNames) {
+					foundall = false
+				} else {
+					// Cycle through all the pod IPs, look for blanks.
+					for _, podip := range podNames {
+						if podip == "" {
+							foundall = false
+						}
 					}
 				}
+
 				if foundall {
 					logrus.Infof("!bang TRACE -- FOUND ALL TRUE")
 					break
