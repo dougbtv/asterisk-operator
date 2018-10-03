@@ -228,7 +228,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	}
 	jsonValue, _ := json.Marshal(jsonData)
 	// response, err = http.Post(endPointURL, "application/json", bytes.NewBuffer(jsonValue))
-	response, err = http.Post(http.MethodPut, endPointURL, bytes.NewBuffer(jsonValue))
+	response, err := http.Post(http.MethodPut, endPointURL, bytes.NewBuffer(jsonValue))
 
 	if err != nil {
 		return fmt.Errorf("The HTTP request failed with error %s", err)
