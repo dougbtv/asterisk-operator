@@ -152,7 +152,7 @@ func cycleAsteriskPods(podNames []string, podList *v1.PodList, namespace string,
 		logrus.Infof("-- Creating trunks for: %v", podname)
 		for eachpodname, podip := range podIPs {
 			if eachpodname != podname {
-				err := createSIPTrunk(podname, podIPs[podname], eachpodname, PodIP)
+				err := createSIPTrunk(podname, podIPs[podname], eachpodname, podip)
 			}
 		}
 	}
