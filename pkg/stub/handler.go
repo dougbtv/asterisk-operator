@@ -74,10 +74,10 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 			logrus.Infof("!bang Pod names: %v", podNames)
 			for _, podn := range podNames {
 				logrus.Infof("!bang each name: %v", podn)
-				poderr, _ := getPodIP(podn)
-				if poderr != nil {
-					return poderr
-				}
+				// poderr, _ := getPodIP(podn)
+				// if poderr != nil {
+				// 	return poderr
+				// }
 			}
 			err := sdk.Update(asterisk)
 			if err != nil {
@@ -158,25 +158,26 @@ func podList() *v1.PodList {
 	}
 }
 
-func getPodIP(string podName) (error, string) {
+// func getPodIP(podName string) (error, string) {
 
-	pods, err := v1.Pods(podName).List(metav1.ListOptions{})
-	if err != nil {
-		// handle error
-		return fmt.Errorf("failed to list pod: %v", podName), nil
-	}
-	for _, pod := range pods.Items {
-		logrus.Infof("!bang Name / PodIP: %v / %v", pod.Name, pod.Status.PodIP)
-		return nil, pod.Status.PodIP
-	}
+// 	pods, err := v1.Pods(podName).List(metav1.ListOptions{})
+// 	if err != nil {
+// 		// handle error
+// 		return fmt.Errorf("failed to list pod: %v", podName), nil
+// 	}
+// 	for _, pod := range pods.Items {
+// 		logrus.Infof("!bang Name / PodIP: %v / %v", pod.Name, pod.Status.PodIP)
+// 		return nil, pod.Status.PodIP
+// 	}
 
-}
+// }
 
 // getPodNames returns the pod names of the array of pods passed in
 func getPodNames(pods []v1.Pod) []string {
 	var podNames []string
 	for _, pod := range pods {
 		logrus.Infof("!bang pod everything: %v", pod)
+		logrus.Infof("!bang pod IP: %v", pod.Status.PodIP)
 		podNames = append(podNames, pod.Name)
 	}
 	return podNames
