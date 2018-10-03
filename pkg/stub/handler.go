@@ -107,7 +107,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 					if err != nil {
 						return fmt.Errorf("failed to list pods: %v", err)
 					}
-					time.Sleep(250 * time.Millisecond)
+					time.Sleep(1000 * time.Millisecond)
 					podIPs = getPodIPs(podList.Items)
 					foundall = true
 				}
