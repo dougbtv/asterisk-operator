@@ -226,7 +226,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	// response, err = http.Post(endPointURL, "application/json", bytes.NewBuffer(jsonValue))
 	req, err := http.NewRequest(http.MethodPut, endPointURL, bytes.NewBuffer([]byte(jsonString)))
 	req.Header.Set("Content-Type", "application/json")
-	_, err := client.Do(req)
+	_, err = client.Do(req)
 	// data, _ := ioutil.ReadAll(response.Body)
 	// logrus.Infof("Endpoint result: %v", string(data))
 
