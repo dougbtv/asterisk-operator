@@ -152,13 +152,17 @@ func cycleAsteriskPods(podNames []string, podList *v1.PodList, namespace string,
 		logrus.Infof("-- Creating trunks for: %v", podname)
 		for eachpodname, podip := range podIPs {
 			if eachpodname != podname {
-				logrus.Infof("Trunk to %v -> %v", eachpodname, podip)
+				err := createSIPTrunk(podname, podIPs[podname], eachpodname, PodIP)
 			}
 		}
 	}
 
 	return nil
 
+}
+
+func createSIPTrunk(targetHostName string, targetHostIP string, endpointName string, endpointIP string) error {
+	logrus.Infof("Trunk to %v -> %v (on %v @ %v)", endpointName, endpointIP, targetHostName, targetHostIP)
 }
 
 // deploymentForAsterisk returns a asterisk Deployment object
@@ -235,7 +239,7 @@ func podList() *v1.PodList {
 func getPodIPs(pods []v1.Pod) map[string]string {
 	podIPs := make(map[string]string)
 	for _, pod := range pods {
-		logrus.Infof("!bang pod everything: %v", pod)
+		// logrus.Infof("!bang pod everything: %v", pod)
 		// logrus.Infof("!bang pod IP: %v", pod.Status.PodIP)
 		podIPs[pod.Name] = pod.Status.PodIP // append(podIPs, pod.Status.PodIP)
 	}
