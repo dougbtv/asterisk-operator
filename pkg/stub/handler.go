@@ -200,8 +200,8 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 
 	for {
 		response, err := http.Get(testURL)
-		testdata, testdatalen := ioutil.ReadAll(response.Body)
-		testdatastring := string(testdata[:testdatalen])
+		testdata, _ := ioutil.ReadAll(response.Body)
+		testdatastring := string(testdata)
 		if strings.Contains(testdatastring, "Invalid method") {
 			// That's good to go, else, keep going.
 			break
