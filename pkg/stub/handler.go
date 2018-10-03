@@ -153,6 +153,9 @@ func cycleAsteriskPods(podNames []string, podList *v1.PodList, namespace string,
 		for eachpodname, podip := range podIPs {
 			if eachpodname != podname {
 				err := createSIPTrunk(podname, podIPs[podname], eachpodname, podip)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
