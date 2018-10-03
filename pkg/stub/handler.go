@@ -226,14 +226,13 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	// response, err = http.Post(endPointURL, "application/json", bytes.NewBuffer(jsonValue))
 	req, err := http.NewRequest(http.MethodPut, endPointURL, bytes.NewBuffer([]byte(jsonString)))
 	req.Header.Set("Content-Type", "application/json")
-	response, err := client.Do(req)
+	_, err := client.Do(req)
+	// data, _ := ioutil.ReadAll(response.Body)
+	// logrus.Infof("Endpoint result: %v", string(data))
 
 	if err != nil {
 		logrus.Errorf("The HTTP request for endpoint failed with error %s", err)
 	}
-
-	// data, _ := ioutil.ReadAll(response.Body)
-	// logrus.Infof("Endpoint result: %v", string(data))
 
 	// ------------------ INDENTITIES
 
@@ -246,14 +245,13 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 
 	req, err = http.NewRequest(http.MethodPut, identifyURL, bytes.NewBuffer([]byte(jsonString)))
 	req.Header.Set("Content-Type", "application/json")
-	response, err = client.Do(req)
+	_, err = client.Do(req)
+	// data, _ = ioutil.ReadAll(response.Body)
+	// logrus.Infof("identify result: %v", string(data))
 
 	if err != nil {
 		logrus.Errorf("The HTTP request for identify failed with error %s", err)
 	}
-
-	// data, _ = ioutil.ReadAll(response.Body)
-	// logrus.Infof("identify result: %v", string(data))
 
 	// ------------------ AORS
 
@@ -265,14 +263,13 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 
 	req, err = http.NewRequest(http.MethodPut, aorsURL, bytes.NewBuffer([]byte(jsonString)))
 	req.Header.Set("Content-Type", "application/json")
-	response, err = client.Do(req)
+	_, err = client.Do(req)
+	// data, _ = ioutil.ReadAll(response.Body)
+	// logrus.Infof("aors result: %v", string(data))
 
 	if err != nil {
 		logrus.Errorf("The HTTP request for aors failed with error %s", err)
 	}
-
-	// data, _ = ioutil.ReadAll(response.Body)
-	// logrus.Infof("aors result: %v", string(data))
 
 	return nil
 }
