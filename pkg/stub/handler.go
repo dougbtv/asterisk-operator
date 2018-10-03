@@ -190,9 +190,14 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	// var url = server_url + "/ari/asterisk/config/dynamic/res_pjsip/endpoint/" + username;
 	// curl -X PUT -H "Content-Type: application/json" -u asterisk:secret -d '{"fields": [ { "attribute": "from_user", "value": "alice" }, { "attribute": "allow", "value": "!all,g722,ulaw,alaw"}, {"attribute": "ice_support", "value": "yes"}, {"attribute": "force_rport", "value": "yes"}, {"attribute": "rewrite_contact", "value": "yes"}, {"attribute": "rtp_symmetric", "value": "yes"}, {"attribute": "context", "value": "default" }, {"attribute": "auth", "value": "alice" }, {"attribute": "aors", "value": "alice"} ] }' https://localhost:8088/ari/asterisk/config/dynamic/res_pjsip/endpoint/alice
 
+	// Create the http client.
+	client := &http.Client{}
+
+	// Setup the URLs
 	sorceryURL := fmt.Sprintf("http://asterisk:asterisk@%s:8088", targetHostIP)
 	testURL := fmt.Sprintf("%s%s%s", sorceryURL, "/ari/asterisk/config/dynamic/res_pjsip", endpointName)
 	endPointURL := fmt.Sprintf("%s%s%s", sorceryURL, "/ari/asterisk/config/dynamic/res_pjsip/endpoint/", endpointName)
+	identifyURL := fmt.Sprintf("%s%s%s", sorceryURL, "/ari/asterisk/config/dynamic/res_pjsip/identify/", endpointName)
 
 	// ------------------ WAIT FOR ASTERISK BOOTED.
 
@@ -230,15 +235,33 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	// response, err = http.Post(endPointURL, "application/json", bytes.NewBuffer(jsonValue))
 	req, err := http.NewRequest(http.MethodPut, endPointURL, bytes.NewBuffer(jsonValue))
 	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
 	response, err := client.Do(req)
 
 	if err != nil {
-		logrus.Errorf("The HTTP request failed with error %s", err)
+		logrus.Errorf("The HTTP request for endpoint failed with error %s", err)
 	}
 
 	data, _ := ioutil.ReadAll(response.Body)
-	fmt.Println(string(data))
+	logrus.Infof("Endpoint result: %v", string(data))
+
+	// ------------------ INDENTITIES
+
+	jsonData = map[string]string{
+		"endpoint": endpointName,
+		"match":    fmt.Sprintf("%s/%s", endpointIP, "32"),
+	}
+
+	jsonValue, _ = json.Marshal(jsonData)
+	req, err = http.NewRequest(http.MethodPut, identifyURL, bytes.NewBuffer(jsonValue))
+	req.Header.Set("Content-Type", "application/json")
+	response, err = client.Do(req)
+
+	if err != nil {
+		logrus.Errorf("The HTTP request for identify failed with error %s", err)
+	}
+
+	data, _ = ioutil.ReadAll(response.Body)
+	logrus.Infof("Endpoint result: %v", string(data))
 
 	/*
 	   url := "http://restapi3.apiary.io/notes"
