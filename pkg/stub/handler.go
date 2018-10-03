@@ -163,6 +163,7 @@ func cycleAsteriskPods(podNames []string, podList *v1.PodList, namespace string,
 
 func createSIPTrunk(targetHostName string, targetHostIP string, endpointName string, endpointIP string) error {
 	logrus.Infof("Trunk to %v -> %v (on %v @ %v)", endpointName, endpointIP, targetHostName, targetHostIP)
+	return nil
 }
 
 // deploymentForAsterisk returns a asterisk Deployment object
