@@ -15,6 +15,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"time"
+
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
 )
 
 // NewHandler used here.
@@ -170,6 +175,38 @@ func cycleAsteriskPods(podNames []string, podList *v1.PodList, namespace string,
 
 func createSIPTrunk(targetHostName string, targetHostIP string, endpointName string, endpointIP string) error {
 	logrus.Infof("Trunk to %v -> %v (on %v @ %v)", endpointName, endpointIP, targetHostName, targetHostIP)
+
+	// response, err := http.Get("https://httpbin.org/ip")
+	// if err != nil {
+	// 	fmt.Printf("The HTTP request failed with error %s\n", err)
+	// } else {
+	// 	data, _ := ioutil.ReadAll(response.Body)
+	// 	fmt.Println(string(data))
+	// }
+
+	// createEndPoint(instance_uuid_a,trunkname,info_b.ip,'32',context,function(err,result){
+	// vac.discoverasterisk.getBoxIP(boxid,function(err,asteriskip){
+	// var url = server_url + "/ari/asterisk/config/dynamic/res_pjsip/endpoint/" + username;
+
+	sorceryUrl := fmt.Sprintf("http://asterisk:asterisk@%s:8088", targetHostIP)
+	endPointUrl := fmt.Sprintf("%s%s%s", sorceryUrl, "/ari/asterisk/config/dynamic/res_pjsip/endpoint/", endpointName)
+
+	jsonData := map[string]string{
+		"transport": "transport-udp",
+		"context":   "default",
+		"aors":      endpointName,
+		"disallow":  "all",
+		"allow":     "ulaw",
+	}
+	jsonValue, _ := json.Marshal(jsonData)
+	response, err = http.Post(endPointUrl, "application/json", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		return fmt.Errorf("The HTTP request failed with error %s", err)
+	}
+
+	data, _ := ioutil.ReadAll(response.Body)
+	fmt.Println(string(data))
+
 	return nil
 }
 
