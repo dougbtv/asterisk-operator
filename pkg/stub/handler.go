@@ -155,6 +155,7 @@ func podList() *v1.PodList {
 func getPodNames(pods []v1.Pod) []string {
 	var podNames []string
 	for _, pod := range pods {
+		logrus.Infof("!bang pod everything: %v", pod)
 		podNames = append(podNames, pod.Name)
 	}
 	return podNames
