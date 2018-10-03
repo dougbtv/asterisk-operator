@@ -188,6 +188,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	// createEndPoint(instance_uuid_a,trunkname,info_b.ip,'32',context,function(err,result){
 	// vac.discoverasterisk.getBoxIP(boxid,function(err,asteriskip){
 	// var url = server_url + "/ari/asterisk/config/dynamic/res_pjsip/endpoint/" + username;
+	// curl -X PUT -H "Content-Type: application/json" -u asterisk:secret -d '{"fields": [ { "attribute": "from_user", "value": "alice" }, { "attribute": "allow", "value": "!all,g722,ulaw,alaw"}, {"attribute": "ice_support", "value": "yes"}, {"attribute": "force_rport", "value": "yes"}, {"attribute": "rewrite_contact", "value": "yes"}, {"attribute": "rtp_symmetric", "value": "yes"}, {"attribute": "context", "value": "default" }, {"attribute": "auth", "value": "alice" }, {"attribute": "aors", "value": "alice"} ] }' https://localhost:8088/ari/asterisk/config/dynamic/res_pjsip/endpoint/alice
 
 	sorceryURL := fmt.Sprintf("http://asterisk:asterisk@%s:8088", targetHostIP)
 	testURL := fmt.Sprintf("%s%s%s", sorceryURL, "/ari/asterisk/config/dynamic/res_pjsip", endpointName)
@@ -226,7 +227,9 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 		"allow":     "ulaw",
 	}
 	jsonValue, _ := json.Marshal(jsonData)
-	response, err := http.Post(endPointURL, "application/json", bytes.NewBuffer(jsonValue))
+	// response, err = http.Post(endPointURL, "application/json", bytes.NewBuffer(jsonValue))
+	response, err = http.Post(http.MethodPut, endPointURL, bytes.NewBuffer(jsonValue))
+
 	if err != nil {
 		return fmt.Errorf("The HTTP request failed with error %s", err)
 	}
