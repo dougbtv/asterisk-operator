@@ -248,7 +248,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 
 	jsonData = map[string]string{
 		"endpoint": endpointName,
-		"match":    fmt.Sprintf("%s/%s", endpointIP, "32"),
+		"match":    fmt.Sprintf("%s/%s", endpointIP, "255.255.255.255"),
 	}
 
 	logrus.Info("jsonData debug: ", jsonData)
