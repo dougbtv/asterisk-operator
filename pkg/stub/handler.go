@@ -96,8 +96,8 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 func cycleAsteriskPods(podNames []string, podList *v1.PodList, namespace string, listOps *metav1.ListOptions) error {
 
 	// We have some weird race, let's try to sleep right away and then requery the api
-	time.Sleep(1500 * time.Millisecond)
-	_ = sdk.List(namespace, podList, sdk.WithListOptions(listOps))
+	// time.Sleep(1500 * time.Millisecond)
+	// _ = sdk.List(namespace, podList, sdk.WithListOptions(listOps))
 
 	// We need to check if there's any blank IPs
 	podIPs := getPodIPs(podList.Items)
@@ -198,7 +198,8 @@ func deploymentForAsterisk(m *v1alpha1.Asterisk) *appsv1.Deployment {
 				},
 				Spec: v1.PodSpec{
 					Containers: []v1.Container{{
-						Image: "dougbtv/asterisk-example-operator",
+						// Image: "dougbtv/asterisk-example-operator",
+						Image: "dougbtv/asterisk14",
 						Name:  "asterisk",
 						// Command: []string{"/bin/bash", "-c", "cat /etc/asterisk/entrypoint.sh | /bin/bash"},
 					}},
