@@ -14,6 +14,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"time"
 )
 
 // NewHandler used here.
@@ -71,16 +72,34 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 		podNames := getPodNames(podList.Items)
 		if !reflect.DeepEqual(podNames, asterisk.Status.Nodes) {
 			asterisk.Status.Nodes = podNames
+
 			logrus.Infof("!bang Pod names: %v", podNames)
 			for _, podn := range podNames {
 				logrus.Infof("!bang each name: %v", podn)
-				// poderr, _ := getPodIP(podn)
-				// if poderr != nil {
-				// 	return poderr
-				// }
 			}
+
+			// We need to check if there's any blank IPs
 			podIPs := getPodIPs(podList.Items)
-			logrus.Infof("!bang Pod IPs: %v", podIPs)
+			foundall := true
+			for {
+				logrus.Infof("!bang Pod IPs: %v", podIPs)
+				for _, podip := range podNames {
+					if podip == "" {
+						foundall := false
+					}
+				}
+				if foundall {
+					logrus.Infof("!bang TRACE -- FOUND ALL TRUE")
+					break
+				} else {
+					// Sleep a little, then get the list again.
+					logrus.Infof("!bang TRACE -- TICKER")
+					time.Sleep(250 * time.Millisecond)
+					podIPs = getPodIPs(podList.Items)
+					foundall = true
+				}
+			}
+
 			err := sdk.Update(asterisk)
 			if err != nil {
 				return fmt.Errorf("failed to update asterisk status: %v", err)
