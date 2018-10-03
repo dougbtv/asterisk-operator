@@ -189,7 +189,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	// var url = server_url + "/ari/asterisk/config/dynamic/res_pjsip/endpoint/" + username;
 
 	sorceryURL := fmt.Sprintf("http://asterisk:asterisk@%s:8088", targetHostIP)
-	endPointURL := fmt.Sprintf("%s%s%s", sorceryUrl, "/ari/asterisk/config/dynamic/res_pjsip/endpoint/", endpointName)
+	endPointURL := fmt.Sprintf("%s%s%s", sorceryURL, "/ari/asterisk/config/dynamic/res_pjsip/endpoint/", endpointName)
 
 	jsonData := map[string]string{
 		"transport": "transport-udp",
@@ -199,7 +199,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 		"allow":     "ulaw",
 	}
 	jsonValue, _ := json.Marshal(jsonData)
-	response, err := http.Post(endPointUrl, "application/json", bytes.NewBuffer(jsonValue))
+	response, err := http.Post(endPointURL, "application/json", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		return fmt.Errorf("The HTTP request failed with error %s", err)
 	}
