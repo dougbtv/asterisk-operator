@@ -247,8 +247,8 @@ func podList() *v1.PodList {
 func getPodIPs(pods []v1.Pod) map[string]string {
 	podIPs := make(map[string]string)
 	for _, pod := range pods {
-		// logrus.Infof("!bang pod everything: %v", pod)
-		// logrus.Infof("!bang pod IP: %v", pod.Status.PodIP)
+		logrus.Infof("!bang pod everything: %v", pod)
+		logrus.Infof("!bang pod IP: %v", pod.Status.PodIP)
 		podIPs[pod.Name] = pod.Status.PodIP // append(podIPs, pod.Status.PodIP)
 	}
 	return podIPs
