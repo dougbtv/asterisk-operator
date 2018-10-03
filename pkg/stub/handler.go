@@ -251,6 +251,8 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 		"match":    fmt.Sprintf("%s/%s", endpointIP, "32"),
 	}
 
+	logrus.Info("jsonData debug: ", jsonData)
+
 	jsonValue, _ = json.Marshal(jsonData)
 	req, err = http.NewRequest(http.MethodPut, identifyURL, bytes.NewBuffer(jsonValue))
 	req.Header.Set("Content-Type", "application/json")
@@ -261,7 +263,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	}
 
 	data, _ = ioutil.ReadAll(response.Body)
-	logrus.Infof("Endpoint result: %v", string(data))
+	logrus.Infof("identify result: %v", string(data))
 
 	/*
 	   url := "http://restapi3.apiary.io/notes"
