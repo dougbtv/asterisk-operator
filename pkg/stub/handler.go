@@ -130,7 +130,7 @@ func cycleAsteriskPods(podNames []string, podList *v1.PodList, namespace string,
 			time.Sleep(1500 * time.Millisecond)
 			foundall = true
 			numfound = 0
-			logrus.Infof("Found only %v/%v IPs -- retrying.", numfound, len(podNames))
+			logrus.Infof("Found only %v/%v IPs -- retrying (attempt %v/%v)", numfound, len(podNames), tries, maxtries)
 
 			// Query the API again.
 			_ = sdk.List(namespace, podList, sdk.WithListOptions(listOps))
@@ -235,7 +235,7 @@ func podList() *v1.PodList {
 func getPodIPs(pods []v1.Pod) map[string]string {
 	podIPs := make(map[string]string)
 	for _, pod := range pods {
-		// logrus.Infof("!bang pod everything: %v", pod)
+		logrus.Infof("!bang pod everything: %v", pod)
 		// logrus.Infof("!bang pod IP: %v", pod.Status.PodIP)
 		podIPs[pod.Name] = pod.Status.PodIP // append(podIPs, pod.Status.PodIP)
 	}
