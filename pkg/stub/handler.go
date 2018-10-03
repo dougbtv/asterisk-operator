@@ -200,7 +200,8 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 
 	for {
 		response, err := http.Get(testURL)
-		if strings.Contains(response.Body, "Invalid method") {
+		testdata, _ := ioutil.ReadAll(response.Body)
+		if strings.Contains(testdata, "Invalid method") {
 			// That's good to go, else, keep going.
 			break
 		}
@@ -208,10 +209,10 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 		// Assess number of tries waiting for success...
 		tries++
 		if tries >= maxtries {
-			return fmt.Errorf("Exceeded %v tries during ")
+			return fmt.Errorf("Exceeded %v tries during wait for asterisk boot", maxtries)
 		}
 		logrus.Infof("Waiting for asterisk boot... %v/%v", tries, maxtries)
-		time.Sleep(1500 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 	}
 
 	// ------------------ ENDPOINTS
