@@ -228,14 +228,39 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	}
 	jsonValue, _ := json.Marshal(jsonData)
 	// response, err = http.Post(endPointURL, "application/json", bytes.NewBuffer(jsonValue))
-	response, err := http.Post(http.MethodPut, endPointURL, bytes.NewBuffer(jsonValue))
+	req, err := http.NewRequest(http.MethodPut, endPointURL, bytes.NewBuffer(jsonValue))
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	response, err := client.Do(req)
 
 	if err != nil {
-		return fmt.Errorf("The HTTP request failed with error %s", err)
+		logrus.Errorf("The HTTP request failed with error %s", err)
 	}
 
 	data, _ := ioutil.ReadAll(response.Body)
 	fmt.Println(string(data))
+
+	/*
+	   url := "http://restapi3.apiary.io/notes"
+	    fmt.Println("URL:>", url)
+
+	    var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
+	    req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	    req.Header.Set("X-Custom-Header", "myvalue")
+	    req.Header.Set("Content-Type", "application/json")
+
+	    client := &http.Client{}
+	    resp, err := client.Do(req)
+	    if err != nil {
+	        panic(err)
+	    }
+	    defer resp.Body.Close()
+
+	    fmt.Println("response Status:", resp.Status)
+	    fmt.Println("response Headers:", resp.Header)
+	    body, _ := ioutil.ReadAll(resp.Body)
+	    fmt.Println("response Body:", string(body))
+	*/
 
 	return nil
 }
