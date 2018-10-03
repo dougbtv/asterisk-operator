@@ -74,7 +74,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 			logrus.Infof("!bang Pod names: %v", podNames)
 			for _, podn := range podNames {
 				logrus.Infof("!bang each name: %v", podn)
-				poderr, _ = getPodIP(podn)
+				poderr, _ := getPodIP(podn)
 				if poderr != nil {
 					return poderr
 				}
