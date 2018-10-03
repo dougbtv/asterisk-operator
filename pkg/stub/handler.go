@@ -102,12 +102,12 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 					break
 				} else {
 					// Sleep a little, then get the list again.
+					time.Sleep(1000 * time.Millisecond)
 					logrus.Infof("!bang TRACE -- TICKER")
 					err = sdk.List(asterisk.Namespace, podList, sdk.WithListOptions(listOps))
 					if err != nil {
 						return fmt.Errorf("failed to list pods: %v", err)
 					}
-					time.Sleep(1000 * time.Millisecond)
 					podIPs = getPodIPs(podList.Items)
 					foundall = true
 				}
