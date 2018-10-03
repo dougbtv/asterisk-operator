@@ -102,7 +102,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 					break
 				} else {
 					// Sleep a little, then get the list again.
-					time.Sleep(1000 * time.Millisecond)
+					time.Sleep(1500 * time.Millisecond)
 					logrus.Infof("!bang TRACE -- TICKER")
 					err = sdk.List(asterisk.Namespace, podList, sdk.WithListOptions(listOps))
 					if err != nil {
