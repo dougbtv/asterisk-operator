@@ -189,7 +189,31 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 	// var url = server_url + "/ari/asterisk/config/dynamic/res_pjsip/endpoint/" + username;
 
 	sorceryURL := fmt.Sprintf("http://asterisk:asterisk@%s:8088", targetHostIP)
+	testURL := fmt.Sprintf("%s%s%s", sorceryURL, "/ari/asterisk/config/dynamic/res_pjsip", endpointName)
 	endPointURL := fmt.Sprintf("%s%s%s", sorceryURL, "/ari/asterisk/config/dynamic/res_pjsip/endpoint/", endpointName)
+
+	// ------------------ WAIT FOR ASTERISK BOOTED.
+
+	tries := 0
+	maxtries := 40
+
+	for {
+		response, err := http.Get(testURL, "application/json")
+		if Contains(response.Body, "Invalid method") {
+			// That's good to go, else, keep going.
+			break
+		}
+
+		// Assess number of tries waiting for success...
+		tries++
+		if tries >= maxtries {
+			return fmt.Errorf("Exceeded %v tries during ")
+		}
+		logrus.Infof("Waiting for asterisk boot... %v/%v", tries, maxtries)
+		time.Sleep(1500 * time.Millisecond)
+	}
+
+	// ------------------ ENDPOINTS
 
 	jsonData := map[string]string{
 		"transport": "transport-udp",
