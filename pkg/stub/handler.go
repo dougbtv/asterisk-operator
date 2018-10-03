@@ -78,7 +78,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 				logrus.Infof("!bang each name: %v", podn)
 			}
 
-			asterr := cycleAsteriskPods(podList, asterisk.Namespace, listOps)
+			asterr := cycleAsteriskPods(podNames, podList, asterisk.Namespace, listOps)
 			if err != nil {
 				return err
 			}
@@ -93,7 +93,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 }
 
 // cycleAsteriskPod cycles each one of the asterisk pods, discovers the IP and then builds sip trunks for each one.
-func cycleAsteriskPods(podList *v1.PodList, namespace string, listOps *metav1.ListOptions) error {
+func cycleAsteriskPods(podNames []string, podList *v1.PodList, namespace string, listOps *metav1.ListOptions) error {
 
 	// We need to check if there's any blank IPs
 	podIPs := getPodIPs(podList.Items)
@@ -127,7 +127,7 @@ func cycleAsteriskPods(podList *v1.PodList, namespace string, listOps *metav1.Li
 			logrus.Infof("!bang TRACE -- TICKER")
 
 			// Query the API again.
-			err = sdk.List(namespace, podList, sdk.WithListOptions(listOps))
+			err := sdk.List(namespace, podList, sdk.WithListOptions(listOps))
 			if err != nil {
 				return fmt.Errorf("failed to list pods during IP discovery: %v", err)
 			}
