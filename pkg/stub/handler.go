@@ -16,8 +16,8 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"time"
 
-	"bytes"
-	"encoding/json"
+	// "bytes"
+	// "encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strings"
