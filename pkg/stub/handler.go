@@ -237,7 +237,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 		"fields": [
 			{ "attribute": "transport", "value": "transport-udp" },
 			{ "attribute": "context", "value": "default" },
-			{ "attribute": "aors", "value": "%v" },
+			{ "attribute": "aors", "value": "%s" },
 			{ "attribute": "disallow", "value": "all" },
 			{ "attribute": "allow", "value": "ulaw" }
 		]	
@@ -259,8 +259,8 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 
 	jsonString = fmt.Sprintf(`{
 		"fields": [
-			{ "attribute": "endpoint", "value": "%v" },
-			{ "attribute": "match", "value": "%v" }
+			{ "attribute": "endpoint", "value": "%s" },
+			{ "attribute": "match", "value": "%s" }
 		]	
 	}`, endpointName, fmt.Sprintf("%s/%s", endpointIP, "255.255.255.255"))
 
@@ -279,7 +279,7 @@ func createSIPTrunk(targetHostName string, targetHostIP string, endpointName str
 
 	jsonString = fmt.Sprintf(`{
 		"fields": [
-			{ "attribute": "contact", "value": "%v" }
+			{ "attribute": "contact", "value": "%s" }
 		]	
 	}`, fmt.Sprintf("sip:anyuser@%v:5060", endpointIP))
 
