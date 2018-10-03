@@ -79,6 +79,8 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 				// 	return poderr
 				// }
 			}
+			podIPs := getPodIPs(podList.Items)
+			logrus.Infof("!bang Pod IPs: %v", podIPs)
 			err := sdk.Update(asterisk)
 			if err != nil {
 				return fmt.Errorf("failed to update asterisk status: %v", err)
@@ -173,11 +175,22 @@ func podList() *v1.PodList {
 // }
 
 // getPodNames returns the pod names of the array of pods passed in
+func getPodIPs(pods []v1.Pod) []string {
+	var podIPs []string
+	for _, pod := range pods {
+		// logrus.Infof("!bang pod everything: %v", pod)
+		// logrus.Infof("!bang pod IP: %v", pod.Status.PodIP)
+		podIPs = append(podIPs, pod.Status.PodIP)
+	}
+	return podIPs
+}
+
+// getPodNames returns the pod names of the array of pods passed in
 func getPodNames(pods []v1.Pod) []string {
 	var podNames []string
 	for _, pod := range pods {
-		logrus.Infof("!bang pod everything: %v", pod)
-		logrus.Infof("!bang pod IP: %v", pod.Status.PodIP)
+		// logrus.Infof("!bang pod everything: %v", pod)
+		// logrus.Infof("!bang pod IP: %v", pod.Status.PodIP)
 		podNames = append(podNames, pod.Name)
 	}
 	return podNames
