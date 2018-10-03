@@ -73,10 +73,10 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 		if !reflect.DeepEqual(podNames, asterisk.Status.Nodes) {
 			asterisk.Status.Nodes = podNames
 
-			logrus.Infof("!bang Pod names: %v", podNames)
-			for _, podn := range podNames {
-				logrus.Infof("!bang each name: %v", podn)
-			}
+			// logrus.Infof("!bang Pod names: %v", podNames)
+			// for _, podn := range podNames {
+			// 	logrus.Infof("!bang each name: %v", podn)
+			// }
 
 			asterr := cycleAsteriskPods(podNames, podList, asterisk.Namespace, listOps)
 			if asterr != nil {
@@ -101,11 +101,14 @@ func cycleAsteriskPods(podNames []string, podList *v1.PodList, namespace string,
 
 	maxtries := 40
 	tries := 0
+	numfound := 0
 
 	for {
-		logrus.Infof("!bang Pod IPs: %v", podIPs)
+
+		// logrus.Infof("!bang Pod IPs: %v", podIPs)
+		// logrus.Infof("!bang Lengths: %v < %v", len(podIPs), len(podNames))
+
 		// If the list is too short, it's not found.
-		logrus.Infof("!bang Lengths: %v < %v", len(podIPs), len(podNames))
 		if len(podIPs) < len(podNames) {
 			foundall = false
 		} else {
@@ -114,6 +117,8 @@ func cycleAsteriskPods(podNames []string, podList *v1.PodList, namespace string,
 				logrus.Infof("!bang each IP: %v", podIPs)
 				if podip == "" {
 					foundall = false
+				} else {
+					numfound++
 				}
 			}
 		}
@@ -124,20 +129,32 @@ func cycleAsteriskPods(podNames []string, podList *v1.PodList, namespace string,
 		} else {
 			// Sleep a little, then get the list again.
 			time.Sleep(1500 * time.Millisecond)
-			logrus.Infof("!bang TRACE -- TICKER")
+			foundall = true
+			numfound = 0
+			logrus.Infof("Found only %v/%v IPs -- retrying.", numfound, len(podNames))
 
 			// Query the API again.
-			err := sdk.List(namespace, podList, sdk.WithListOptions(listOps))
-			if err != nil {
-				return fmt.Errorf("failed to list pods during IP discovery: %v", err)
-			}
+			_ := sdk.List(namespace, podList, sdk.WithListOptions(listOps))
 			podIPs = getPodIPs(podList.Items)
-			foundall = true
+			// We might not care if this fails...
+			// if err != nil {
+			// 	return fmt.Errorf("failed to list pods during IP discovery: %v", err)
+			// }
 		}
 
 		tries++
 		if tries >= maxtries {
 			return fmt.Errorf("During IP discovery, exceeded %v", maxtries)
+		}
+	}
+
+	// No let's cycle through each name and then build SIP trunks for each of those for all of the others
+	for _, podname := range podNames {
+		logrus.Infof("-- Creating trunks for: %v", podname)
+		for eachpodname, podip := range podIPs {
+			if eachpodname != podname {
+				logrus.Infof("Trunk to %v -> %v", eachpodname, podip)
+			}
 		}
 	}
 
